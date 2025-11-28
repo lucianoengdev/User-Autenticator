@@ -1,5 +1,5 @@
 from .init import app
-from flask import render_template
+from flask import render_template, url_for, redirect
 
 @app.route('/')
 @app.route('/home')
@@ -17,5 +17,6 @@ def login():
 
 @app.route('/logout')
 def logout():
-    return render_template("logout.html")
+    return redirect(url_for("home"))
+
 
