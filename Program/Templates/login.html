@@ -55,11 +55,12 @@ Login Page
         </symbol>
     </svg>
     <main class="form-signin w-100 m-auto">
-        <form> <img class="mb-4 mx-auto d-block" src="/docs/5.3/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
+        <form method="POST" action="{{url_for ('login') }}">4
+            <img class="mb-4 mx-auto d-block" src="https://www.verzani.com.br/wp-content/uploads/2022/05/post_thumbnail-ae9648a8de49577c535e7453c0fe6ef3.jpeg" alt="" width="72" height="57">
             <h1 class="h3 mb-4 text-center">Faça o Login</h1>
-            <div class="form-floating"> <input type="email" class="form-control" id="floatingInput"
+            <div class="form-floating"> <input type="email" class="form-control" id="floatingInput" name="email"
                     placeholder="name@example.com"> <label for="floatingInput">Email</label> </div>
-            <div class="form-floating"> <input type="password" class="form-control" id="floatingPassword"
+            <div class="form-floating"> <input type="password" class="form-control" id="floatingPassword" name="password"
                     placeholder="Password"> <label for="floatingPassword">Senha</label> </div>
             <div class="form-check text-start my-3"> <input class="form-check-input" type="checkbox" value="remember-me"
                     id="checkDefault"> <label class="form-check-label" for="checkDefault">
