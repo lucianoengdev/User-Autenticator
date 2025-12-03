@@ -2,3 +2,682 @@
     {% block tittle %}
         User Autenticator
     {% endblock %}
+{% block content %}
+
+<title>Dormentes de Polímero Reciclado: Análise Interativa</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-light: #FFFAF0;
+        --text-dark: #363432;
+        --primary: #c7800c;
+        --primary-dark: #a16207;
+        --secondary: #0d9488;
+        --border-light: #e7e5e4;
+    }
+    body {
+        background-color: var(--bg-light);
+        color: var(--text-dark);
+        font-family: 'Inter', sans-serif;
+    }
+    .nav-link.active {
+        background-color: var(--primary);
+        color: white;
+    }
+    .nav-link:hover {
+        background-color: var(--primary-dark);
+        color: white;
+    }
+    .nav-tab.active {
+        border-bottom-color: var(--primary);
+        color: var(--primary);
+        font-weight: 600;
+    }
+    .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 320px;
+        max-height: 400px;
+    }
+    @media (min-width: 768px) {
+        .chart-container {
+            height: 350px;
+            max-height: 450px;
+        }
+    }
+    .tab-content {
+        display: none;
+    }
+    .tab-content.active {
+        display: block;
+    }
+    .roadmap-step {
+        position: relative;
+        padding-left: 2.5rem;
+        padding-bottom: 1.5rem;
+        border-left: 2px solid var(--border-light);
+    }
+    .roadmap-step:last-child {
+        border-left: 2px solid transparent;
+        padding-bottom: 0;
+    }
+    .roadmap-dot {
+        position: absolute;
+        left: -0.7rem;
+        top: 0.1rem;
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: 9999px;
+        background-color: var(--bg-light);
+        border: 2px solid var(--secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: var(--secondary);
+    }
+    .case-study-card {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid var(--border-light);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .extreme-icon {
+        font-size: 3rem;
+        line-height: 1;
+        margin-bottom: 1rem;
+        animation: pulse 2s infinite ease-in-out;
+    }
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    .track-container {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        height: 150px;
+        margin: 2rem auto 0 auto;
+        background-color: #a16207;
+        background-image: linear-gradient(45deg, #b9936c 25%, transparent 25%, transparent 75%, #b9936c 75%, #b9936c), linear-gradient(45deg, #b9936c 25%, transparent 25%, transparent 75%, #b9936c 75%, #b9936c);
+        background-size: 20px 20px;
+        background-position: 0 0, 10px 10px;
+        padding: 20px 0;
+        border-radius: 8px;
+    }
+    .rail {
+        position: absolute;
+        width: 100%;
+        height: 12px;
+        background-color: #57534e;
+        left: 0;
+        z-index: 10;
+    }
+    .rail-top { top: 30px; }
+    .rail-bottom { bottom: 30px; }
+    .sleeper-container {
+        display: flex;
+        justify-content: space-around;
+        padding: 0 20px;
+        height: 100%;
+        align-items: center;
+    }
+    .sleeper {
+        width: 30px;
+        height: 180px;
+        transition: background-color 1s ease-in-out, transform 0.5s ease;
+    }
+    .sleeper-wood {
+        background-color: #855d33;
+        transform: rotate(90deg);
+    }
+    .sleeper-concrete {
+        background-color: #a8a29e;
+        transform: rotate(90deg);
+    }
+    .sleeper-polymer {
+        background-color: #363432;
+        transform: rotate(90deg);
+    }
+</style>
+
+<body class="antialiased">
+
+    <!-- 
+    Chosen Palette: Warm Neutrals (BG: #FFFAF0, Text: #363432, Primary: #a16207, Secondary: #0d9488)
+    Application Structure Plan: Uma SPA temática, de rolagem vertical, com uma barra de navegação fixa. A estrutura guia o usuário por quatro seções lógicas: 1. O Problema (apresentando os desafios dos dormentes tradicionais usando cards de HTML/CSS), 2. A Solução (introduzindo o dormente de polímero com um diagrama de fluxo simples em HTML), 3. Análise Comparativa (a seção principal, usando abas JS interativas para os 5 pilares e gráficos Chart.js para comparar Peso e Custo Total de Propriedade), e 4. Próximos Passos (um roadmap em HTML/CSS para a adoção). Esta estrutura foi escolhida por ser mais intuitiva para a exploração de dados do que os slides lineares, permitindo ao usuário ver o "porquê", "o quê", "como funciona" e "o que vem a seguir" de forma coesa.
+    Visualization & Content Choices: 
+    - Report Info: Problemas Madeira/Concreto (Slide 2) -> Goal: Comparar desvantagens -> Viz: Cards HTML/Tailwind -> Interaction: Nenhuma (leitura estática) -> Justification: Comparação textual clara lado a lado. -> Method: HTML/CSS.
+    - Report Info: Processo de Reciclagem (Slide 3) -> Goal: Mostrar fluxo -> Viz: Diagrama de fluxo horizontal (Ícone -> Seta -> Ícone) -> Interaction: Nenhuma -> Justification: Simples visualização da transformação da matéria-prima. -> Method: HTML/CSS/Unicode.
+    - Report Info: Comparação de Peso (Slide 10.2) -> Goal: Comparar peso físico -> Viz: Gráfico de Barras Verticais (Chart.js) -> Interaction: Hover/Tooltip -> Justification: Comparação quantitativa direta (Madeira, Concreto, Polímero). -> Method: Chart.js (Canvas).
+    - Report Info: Viabilidade Econômica/TCO (Slide 10.3) -> Goal: Demonstrar economia a longo prazo -> Viz: Gráfico de Barras Empilhadas (Chart.js) -> Interaction: Hover/Tooltip -> Justification: Separa visualmente CAPEX (Custo Inicial) de OPEX (Manutenção) para destacar a economia operacional de 40%. -> Method: Chart.js (Canvas).
+    - Report Info: 5 Pilares (Slide 10) -> Goal: Organizar informação densa -> Viz: Abas (TABS) -> Interaction: Clique para trocar conteúdo -> Justification: Divide a informação mais complexa em partes gerenciáveis, melhorando o foco. -> Method: Vanilla JS (show/hide).
+    - Report Info: Caminhos para Adoção (Slide 11) -> Goal: Mostrar sequência de ações -> Viz: Roadmap vertical numerado -> Interaction: Nenhuma -> Justification: Apresentação clara de um processo passo a passo. -> Method: HTML/CSS.
+    CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-[var(--border-light)]">
+        <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold" style="color: var(--primary-dark);">Dormentes Interativo</h1>
+                </div>
+                <div class="hidden md:flex md:space-x-2">
+                    <a href="#problema" class="nav-link text-sm font-medium rounded-md px-3 py-2 transition-colors duration-200">O Problema</a>
+                    <a href="#solucao" class="nav-link text-sm font-medium rounded-md px-3 py-2 transition-colors duration-200">A Solução</a>
+                    <a href="#casos-globais" class="nav-link text-sm font-medium rounded-md px-3 py-2 transition-colors duration-200">Casos Globais</a>
+                    <a href="#analise" class="nav-link text-sm font-medium rounded-md px-3 py-2 transition-colors duration-200">Análise Comparativa</a>
+                    <a href="#passos" class="nav-link text-sm font-medium rounded-md px-3 py-2 transition-colors duration-200">Próximos Passos</a>
+                    <a href="#evolucao" class="nav-link text-sm font-medium rounded-md px-3 py-2 transition-colors duration-200">Evolução</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="pt-20">
+
+        <section id="hero" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight" style="color: var(--primary-dark);">
+                Dormentes Ferroviários de Polímeros Reciclados
+            </h1>
+            <p class="mt-4 text-lg md:text-xl text-neutral-700 max-w-3xl mx-auto">
+                Uma análise interativa sobre a inovação, viabilidade e sustentabilidade que pode transformar a infraestrutura ferroviária brasileira.
+            </p>
+        </section>
+
+        <section id="problema" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <h2 class="text-3xl font-bold text-center mb-4">O Problema da Via Permanente Tradicional</h2>
+            <p class="text-lg text-neutral-700 text-center max-w-4xl mx-auto mb-12">
+                Os dormentes são a fundação da ferrovia, mas os materiais convencionais, madeira e concreto, apresentam limitações críticas. Eles geram altos custos de manutenção, causam degradação ambiental e não solucionam o problema crescente dos resíduos plásticos.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="bg-white p-6 rounded-lg shadow-md border border-[var(--border-light)]">
+                    <h3 class="text-2xl font-semibold mb-4 text-red-700">Dormentes de Madeira</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-3 mt-1">✖</span>
+                            <span>Causa desmatamento acelerado para obtenção da matéria-prima.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-3 mt-1">✖</span>
+                            <span>Exige tratamento com creosoto, um produto químico tóxico que contamina o solo.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-3 mt-1">✖</span>
+                            <span>Baixa vida útil (15-25 anos) devido à biodegradação e ataque de pragas.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-[var(--border-light)]">
+                    <h3 class="text-2xl font-semibold mb-4 text-gray-700">Dormentes de Concreto</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-gray-500 mr-3 mt-1">✖</span>
+                            <span>Produção de cimento é responsável por elevadas emissões de $CO_2$.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-gray-500 mr-3 mt-1">✖</span>
+                            <span>Peso excessivo (aprox. 300 kg), dificultando e encarecendo a logística e instalação.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-gray-500 mr-3 mt-1">✖</span>
+                            <span>Baixa absorção de vibração, causando fadiga, fissuras e maior desgaste do trilho.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <p class="text-center text-lg font-semibold mt-12 max-w-3xl mx-auto" style="color: var(--secondary);">
+                Contexto Global: Bilhões de toneladas de resíduos plásticos se acumulam anualmente, criando uma urgência por soluções de engenharia que transformem esse passivo ambiental em um ativo.
+            </p>
+        </section>
+
+        <section id="solucao" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-white rounded-lg shadow-lg border border-[var(--border-light)]">
+            <h2 class="text-3xl font-bold text-center mb-4" style="color: var(--primary-dark);">A Inovação: A Solução Circular</h2>
+            <p class="text-lg text-neutral-700 text-center max-w-4xl mx-auto mb-12">
+                A solução é um dormente compósito, produzido a partir de polímeros pós-consumo (plástico 100% reciclado). Esta inovação não apenas substitui materiais problemáticos com desempenho superior, mas também cria uma economia circular para um dos maiores poluentes do mundo.
+            </p>
+
+            <div class="flex flex-col md:flex-row items-center justify-center space-y-6 md:space-y-0 md:space-x-8 text-center">
+                <div class="flex flex-col items-center p-4">
+                    <span class="text-6xl mb-2">♻️</span>
+                    <h4 class="text-xl font-semibold">1. Resíduo Plástico</h4>
+                    <p class="text-neutral-600">Coleta de lixo pós-consumo (garrafas, embalagens, etc.).</p>
+                </div>
+                <div class="text-4xl font-bold hidden md:block" style="color: var(--primary);">→</div>
+                <div class="text-4xl font-bold md:hidden" style="color: var(--primary);">↓</div>
+                <div class="flex flex-col items-center p-4">
+                    <span class="text-6xl mb-2">🏭</span>
+                    <h4 class="text-xl font-semibold">2. Processamento</h4>
+                    <p class="text-neutral-600">Material é limpo, triturado e moldado por extrusão.</p>
+                </div>
+                <div class="text-4xl font-bold hidden md:block" style="color: var(--primary);">→</div>
+                <div class="text-4xl font-bold md:hidden" style="color: var(--primary);">↓</div>
+                <div class="flex flex-col items-center p-4">
+                    <span class="text-6xl mb-2">🛤️</span>
+                    <h4 class="text-xl font-semibold">3. Novo Dormente</h4>
+                    <p class="text-neutral-600">Produto final durável, leve e 100% reciclável.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="casos-globais" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <h2 class="text-3xl font-bold text-center mb-4">Adoção Global: Testes em Condições Extremas</h2>
+            <p class="text-lg text-neutral-700 text-center max-w-4xl mx-auto mb-12">
+                A tecnologia de dormentes compósitos já é uma realidade em múltiplos continentes, demonstrando sua viabilidade e resistência nos ambientes mais desafiadores.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="case-study-card">
+                    <div class="extreme-icon" style="color: #3b82f6; animation-delay: 0s;">🌧️</div>
+                    <h3 class="text-2xl font-semibold mb-3">Reino Unido</h3>
+                    <p class="text-neutral-700">A Network Rail utiliza dormentes reciclados em áreas de umidade extrema e túneis. A resistência à putrefação e a absorção de vibração são cruciais em linhas de tráfego intenso e solo encharcado.</p>
+                </div>
+                <div class="case-study-card">
+                    <div class="extreme-icon" style="color: #f97316; animation-delay: 0.3s;">☀️</div>
+                    <h3 class="text-2xl font-semibold mb-3">Austrália</h3>
+                    <p class="text-neutral-700">Em um dos climas mais quentes e secos, os dormentes de polímero resistem à alta radiação UV, calor extremo e são imunes a cupins. Também não propagam chamas, sendo ideais para áreas com risco de incêndio.</p>
+                </div>
+                <div class="case-study-card">
+                    <div class="extreme-icon" style="color: #67e8f9; animation-delay: 0.6s;">❄️</div>
+                    <h3 class="text-2xl font-semibold mb-3">Finlândia</h3>
+                    <p class="text-neutral-700">Testes validam a aplicação em climas de frio extremo. Os dormentes resistem aos ciclos de congelamento e degelo, não absorvem água e mantêm sua integridade estrutural onde a madeira e o concreto racham.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="analise" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <h2 class="text-3xl font-bold text-center mb-4">Análise Comparativa: Os 5 Pilares</h2>
+            <p class="text-lg text-neutral-700 text-center max-w-4xl mx-auto mb-12">
+                Esta tecnologia se destaca em cinco áreas estratégicas. Explore as abas abaixo para entender por que os dormentes de polímero são uma solução superior em termos de desempenho, custo e impacto ambiental.
+            </p>
+
+            <div class="border-b border-gray-300 mb-8">
+                <nav class="flex flex-wrap -mb-px justify-center gap-x-4 md:gap-x-8" aria-label="Tabs">
+                    <button class="nav-tab active text-lg border-b-2 border-transparent py-4 px-1" data-tab="tab-sustentabilidade">Sustentabilidade</button>
+                    <button class="nav-tab text-lg border-b-2 border-transparent py-4 px-1" data-tab="tab-desempenho">Desempenho</button>
+                    <button class="nav-tab text-lg border-b-2 border-transparent py-4 px-1" data-tab="tab-economia">Viabilidade Econômica</button>
+                    <button class="nav-tab text-lg border-b-2 border-transparent py-4 px-1" data-tab="tab-sinergias">Sinergias Locais</button>
+                    <button class="nav-tab text-lg border-b-2 border-transparent py-4 px-1" data-tab="tab-casos">Casos de Uso</button>
+                </nav>
+            </div>
+
+            <div class="mt-8">
+                <div id="tab-sustentabilidade" class="tab-content active">
+                    <h3 class="text-2xl font-semibold text-center mb-6" style="color: var(--secondary);">Pilar 1: Sustentabilidade</h3>
+                    <p class="text-center text-lg max-w-3xl mx-auto mb-8">Cria uma economia circular perfeita. Retira toneladas de plástico do meio ambiente e, ao fim de sua longa vida útil, o próprio dormente pode ser 100% reciclado para criar um novo.</p>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-[var(--border-light)] max-w-3xl mx-auto">
+                        <ul class="space-y-4">
+                            <li class="flex items-center text-lg">
+                                <span class="text-green-600 mr-3 text-2xl">✓</span>
+                                <span>Destino nobre para resíduos plásticos pós-consumo.</span>
+                            </li>
+                            <li class="flex items-center text-lg">
+                                <span class="text-green-600 mr-3 text-2xl">✓</span>
+                                <span>Pegada de $CO_2$ muito inferior à produção de cimento.</span>
+                            </li>
+                            <li class="flex items-center text-lg">
+                                <span class="text-green-600 mr-3 text-2xl">✓</span>
+                                <span>100% Reciclável, fechando o ciclo da economia circular.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="tab-desempenho" class="tab-content">
+                    <h3 class="text-2xl font-semibold text-center mb-6" style="color: var(--secondary);">Pilar 2: Desempenho Técnico Superior</h3>
+                    <p class="text-center text-lg max-w-3xl mx-auto mb-8">O material compósito é mais leve que o concreto, facilitando a instalação, e absorve mais vibração, reduzindo o desgaste dos trilhos e o ruído.</p>
+                    <div class="bg-white p-4 md:p-6 rounded-lg shadow-md border border-[var(--border-light)]">
+                        <h4 class="text-xl font-semibold text-center mb-4">Comparativo de Peso Médio por Dormente</h4>
+                        <div class="chart-container">
+                            <canvas id="pesoChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-economia" class="tab-content">
+                    <h3 class="text-2xl font-semibold text-center mb-6" style="color: var(--secondary);">Pilar 3: Viabilidade Econômica</h3>
+                    <p class="text-center text-lg max-w-3xl mx-auto mb-8">Embora o custo inicial (CAPEX) seja similar ao do concreto, a economia real vem do Custo Total de Propriedade (TCO). A vida útil de 30-50+ anos e a baixíssima necessidade de manutenção podem reduzir custos operacionais (OPEX) em até 40%.</p>
+                    <div class="bg-white p-4 md:p-6 rounded-lg shadow-md border border-[var(--border-light)]">
+                        <h4 class="text-xl font-semibold text-center mb-4">Custo Total de Propriedade (TCO) - Análise</h4>
+                        <div class="chart-container">
+                            <canvas id="tcoChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-sinergias" class="tab-content">
+                    <h3 class="text-2xl font-semibold text-center mb-6" style="color: var(--secondary);">Pilar 4: Sinergias Locais</h3>
+                    <p class="text-center text-lg max-w-3xl mx-auto mb-8">O Brasil é um cenário ideal para esta tecnologia. Usar o resíduo plástico gerado localmente cria uma nova indústria, reduz custos de logística reversa e fortalece a economia circular.</p>
+                    <div class="bg-white p-10 rounded-lg shadow-md border border-[var(--border-light)] max-w-2xl mx-auto text-center">
+                        <div class="text-5xl font-bold" style="color: var(--primary-dark);">11 Milhões</div>
+                        <div class="text-xl font-semibold text-neutral-700 mt-2">de toneladas de lixo plástico geradas pelo Brasil anualmente.</div>
+                    </div>
+                </div>
+
+                <div id="tab-casos" class="tab-content">
+                    <h3 class="text-2xl font-semibold text-center mb-6" style="color: var(--secondary);">Pilar 5: Casos de Uso Prioritários</h3>
+                    <p class="text-center text-lg max-w-3xl mx-auto mb-8">Esta solução é ideal para concessionárias que buscam reduzir despesas de manutenção (OPEX), especialmente em operações severas ou de alto tráfego.</p>
+                    <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                        <div class="bg-white p-6 rounded-lg shadow-md border border-[var(--border-light)]">
+                            <h4 class="text-xl font-semibold mb-2">Ferrovias de Carga (Heavy Haul)</h4>
+                            <p class="text-neutral-700">Empresas como Vale e MRS, que operam com cargas pesadíssimas, se beneficiam da durabilidade e da menor necessidade de interrupção da linha para manutenção.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md border border-[var(--border-light)]">
+                            <h4 class="text-xl font-semibold mb-2">Ferrovias Urbanas (Metrôs)</h4>
+                    <p class="text-neutral-700">Incentivos para construir fábricas locais. Criar ecossistema de produção e logística reversa.</p>
+                </div>
+            </div>
+
+            <p class="text-center text-lg font-semibold mt-12 max-w-3xl mx-auto" style="color: var(--primary-dark);">
+                Perspectiva: Dominar a sustentabilidade e a economia circular não é mais um diferencial, mas uma necessidade estratégica para uma infraestrutura ferroviária resiliente e competitiva.
+            </p>
+        </section>
+
+        <section id="evolucao" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <h2 class="text-3xl font-bold text-center mb-4">A Evolução da Via Permanente</h2>
+            <p class="text-lg text-neutral-700 text-center max-w-4xl mx-auto mb-8">
+                Uma animação visual demonstrando a transição dos materiais ao longo das eras, culminando na solução sustentável e de alta performance.
+            </p>
+
+            <div id="evolution-text" class="text-center text-2xl font-semibold mb-6 h-8 transition-opacity duration-500" style="color: var(--primary-dark);">
+                Era da Madeira
+            </div>
+
+            <div class="track-container">
+                <div class="rail rail-top"></div>
+                <div class="sleeper-container">
+                    <div class="sleeper sleeper-wood"></div>
+                    <div class="sleeper sleeper-wood"></div>
+                    <div class="sleeper sleeper-wood"></div>
+                    <div class="sleeper sleeper-wood"></div>
+                    <div class="sleeper sleeper-wood"></div>
+                    <div class="sleeper sleeper-wood"></div>
+                    <div class="sleeper sleeper-wood"></div>
+                    <div class="sleeper sleeper-wood"></div>
+                    <div class="sleeper sleeper-wood"></div>
+                    <div class="sleeper sleeper-wood"></div>
+                </div>
+                <div class="rail rail-bottom"></div>
+            </div>
+            
+            <button id="restart-animation" class="mt-8 mx-auto block px-6 py-2 rounded-md font-semibold text-white transition-colors duration-200" style="background-color: var(--primary);">
+                Reiniciar Animação
+            </button>
+        </section>
+
+    </main>
+
+    <footer class="mt-16 pb-8 text-center text-neutral-600">
+        <p class="text-sm">Baseado na apresentação "Dormentes Ferroviários de Polímeros Reciclados"</p>
+        <p class="text-sm">CEFET-MG | Disciplina: Infraestrutura Ferroviária | 23/10/2025</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chartData = {
+                peso: {
+                    labels: ['Madeira (Média)', 'Polímero Reciclado', 'Concreto'],
+                    datasets: [{
+                        label: 'Peso Médio (kg)',
+                        data: [80, 110, 300],
+                        backgroundColor: [
+                            'rgba(161, 98, 7, 0.7)',
+                            'rgba(13, 148, 136, 0.7)',
+                            'rgba(107, 114, 128, 0.7)',
+                        ],
+                        borderColor: [
+                            'rgb(161, 98, 7)',
+                            'rgb(13, 148, 136)',
+                            'rgb(107, 114, 128)',
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                tco: {
+                    labels: ['Dormente Tradicional (Concreto)', 'Dormente de Polímero'],
+                    datasets: [{
+                        label: 'Custo Inicial (CAPEX)',
+                        data: [100, 105],
+                        backgroundColor: 'rgba(217, 119, 6, 0.7)',
+                        borderColor: 'rgb(217, 119, 6)',
+                        borderWidth: 2
+                    }, {
+                        label: 'Custo de Manutenção (OPEX)',
+                        data: [80, 15],
+                        backgroundColor: 'rgba(217, 0, 0, 0.7)',
+                        borderColor: 'rgb(217, 0, 0)',
+                        borderWidth: 2
+                    }]
+                }
+            };
+
+            const chartOptions = {
+                peso: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#363432',
+                            titleFont: { size: 16 },
+                            bodyFont: { size: 14 },
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw} kg`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Peso (kg)',
+                                font: { size: 14 }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: { size: 14 }
+                            }
+                        }
+                    }
+                },
+                tco: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            backgroundColor: '#363432',
+                            titleFont: { size: 16 },
+                            bodyFont: { size: 14 },
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw} (Unidade de Custo)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            ticks: {
+                                font: { size: 14 },
+                                callback: function(value, index, values) {
+                                    const label = this.getLabelForValue(value);
+                                    return label.split(' '); 
+                                }
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'Custo Total (Unidades Relativas)',
+                                font: { size: 14 }
+                            }
+                        }
+                    }
+                }
+            };
+            
+            let pesoChartInstance = null;
+            let tcoChartInstance = null;
+
+            function initPesoChart() {
+                const ctx = document.getElementById('pesoChart').getContext('2d');
+                pesoChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData.peso,
+                    options: chartOptions.peso
+                });
+            }
+
+            function initTcoChart() {
+                const ctx = document.getElementById('tcoChart').getContext('2d');
+                tcoChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData.tco,
+                    options: chartOptions.tco
+                });
+            }
+            
+            const tabs = document.querySelectorAll('.nav-tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(item => item.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    const targetId = tab.dataset.tab;
+                    contents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === targetId) {
+                            content.classList.add('active');
+                        }
+                    });
+
+                    if (targetId === 'tab-desempenho' && !pesoChartInstance) {
+                        initPesoChart();
+                    }
+                    if (targetId === 'tab-economia' && !tcoChartInstance) {
+                        initTcoChart();
+                    }
+                });
+            });
+            
+            document.getElementById('tab-sustentabilidade').classList.add('active');
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (window.scrollY >= sectionTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    document.querySelector(targetId).scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                });
+            });
+
+            const sleepers = document.querySelectorAll('.sleeper');
+            const evolutionText = document.getElementById('evolution-text');
+            const restartButton = document.getElementById('restart-animation');
+            let animationTimeout1, animationTimeout2, animationTimeout3;
+
+            function startEvolutionAnimation() {
+                clearTimeout(animationTimeout1);
+                clearTimeout(animationTimeout2);
+                clearTimeout(animationTimeout3);
+
+                evolutionText.style.opacity = 0;
+                sleepers.forEach(s => {
+                    s.className = 'sleeper'; 
+                });
+
+                animationTimeout1 = setTimeout(() => {
+                    evolutionText.textContent = 'Era da Madeira';
+                    evolutionText.style.opacity = 1;
+                    sleepers.forEach(s => s.classList.add('sleeper-wood'));
+                }, 100);
+
+                animationTimeout2 = setTimeout(() => {
+                    evolutionText.style.opacity = 0;
+                }, 3500);
+
+                animationTimeout3 = setTimeout(() => {
+                    evolutionText.textContent = 'Era do Concreto';
+                    evolutionText.style.opacity = 1;
+                    sleepers.forEach(s => {
+                        s.classList.remove('sleeper-wood');
+                        s.classList.add('sleeper-concrete');
+                    });
+                }, 4000);
+
+                setTimeout(() => {
+                    evolutionText.style.opacity = 0;
+                }, 7500);
+
+                setTimeout(() => {
+                    evolutionText.textContent = 'O Futuro: Polímero Reciclado';
+                    evolutionText.style.opacity = 1;
+                    sleepers.forEach(s => {
+                        s.classList.remove('sleeper-concrete');
+                        s.classList.add('sleeper-polymer');
+                    });
+                }, 8000);
+            }
+
+            restartButton.addEventListener('click', startEvolutionAnimation);
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        startEvolutionAnimation();
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            observer.observe(document.getElementById('evolucao'));
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+{% endblock %}
