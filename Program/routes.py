@@ -49,12 +49,14 @@ def login():
             flash('Você está logado!')
             return redirect(url_for('home'))
         else:
-            flash('Login inválido ou senha incorreta')     
+            flash('Login inválido ou senha incorreta!')     
     
     return render_template("login.html")
 
 @app.route('/logout')
 def logout():
+    logout_user()
+    flash('Você saiu do programa!', category='info')
     return redirect(url_for("login"))
 
 
