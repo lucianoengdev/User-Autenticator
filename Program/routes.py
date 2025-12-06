@@ -44,7 +44,8 @@ def login():
         user_password = request.form['password']
 
         user_data = User.query.filter_by(email=user_email).first()
-        if user_data and user_data.password == user_password:
+        if user_data and user_data.check_password_correction(user_password):
+
             login_user(user_data)
             flash('Você está logado!')
             return redirect(url_for('home'))
