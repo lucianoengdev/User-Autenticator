@@ -1,16 +1,51 @@
 from .init import app, db, login_manager
 from flask import Flask, request, render_template, url_for, redirect, flash
 from flask_login import login_user, logout_user, current_user, login_required
-from .forms import registro
+from .forms import registro, CalculoFerroviario
 from .models import User
 
 
 
-@app.route('/')
-@app.route('/home')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/home', methods=['GET', 'POST'])
 @login_required
 def home():
-    return render_template("home.html")
+    form = CalculoFerroviario()
+    resultados = None
+    
+    if form.validate_on_submit():
+        V = form.velocidade.data
+        R = form.raio.data
+        b = form.bitola.data
+        Lb = form.largura_boleto.data
+        H = form.altura_cg.data
+        eta = form.coef_seguranca.data
+        d = form.deslocamento_cg.data
+        Jc = form.aceleracao_jc.data
+        g = form.gravidade.data
+
+        B = b + Lb
+
+        
+        h_teorica = (B * (V ** 2)) / (127 * R)
+
+        termo_seguranca = (B / (H * eta)) * ((B / 2) - d)
+
+        h_seguranca = h_teorica - termo_seguranca
+
+        h_seguranca_parado = termo_seguranca
+
+        h_conforto = h_teorica - ((Jc * B) / g)
+
+        resultados = {
+            "h_teorica": round(h_teorica, 4),
+            "h_seguranca": round(h_seguranca, 4),
+            "h_seguranca_parado": round(h_seguranca_parado, 4),
+            "h_conforto": round(h_conforto, 4),
+            "unidade": "metros"
+        }
+
+    return render_template("home.html", form=form, resultados=resultados)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
