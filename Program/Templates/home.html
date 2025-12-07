@@ -2,24 +2,129 @@
     {% block tittle %}
         User Autenticator
     {% endblock %}
+
+{% block style %}
+<style>
+    .result-card {
+        background-color: #f8f9fa;
+        border-left: 5px solid #0d6efd;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 5px;
+    }
+    .result-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #0d6efd;
+    }
+</style>
+{% endblock %}
+
+
 {% block content %}
 
-<body>
-    <main>
-        <header>
-            <h1>Hello, World</h1>
-        </header>
-        <article>
-            <h2>Teste de Criação de Branchs</h2>
-            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Repellat, impedit. Quidem dignissimos nemo autem vitae a corporis, ullam amet veritatis? Commodi odio tenetur obcaecati doloribus rerum natus qui blanditiis accusamus?</p>
-            <h2>Estudo de GITHUB</h2>
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Eaque inventore saepe consectetur asperiores, itaque blanditiis commodi magnam? Vitae ducimus, corporis provident non aspernatur nisi error explicabo totam ipsa eaque necessitatibus.</p>
-        </article>
-    </main>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <h2 class="mb-4">Entrada de Dados</h2>
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.velocidade(class="form-control", placeholder=" ") }}
+                            {{ form.velocidade.label }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.raio(class="form-control", placeholder=" ") }}
+                            {{ form.raio.label }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.bitola(class="form-control", placeholder=" ") }}
+                            {{ form.bitola.label }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.largura_boleto(class="form-control", placeholder=" ") }}
+                            {{ form.largura_boleto.label }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.altura_cg(class="form-control", placeholder=" ") }}
+                            {{ form.altura_cg.label }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.coef_seguranca(class="form-control", placeholder=" ") }}
+                            {{ form.coef_seguranca.label }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.deslocamento_cg(class="form-control", placeholder=" ") }}
+                            {{ form.deslocamento_cg.label }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ form.aceleracao_jc(class="form-control", placeholder=" ") }}
+                            {{ form.aceleracao_jc.label }}
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                         <div class="form-floating mb-3">
+                            {{ form.gravidade(class="form-control", placeholder=" ") }}
+                            {{ form.gravidade.label }}
+                        </div>
+                    </div>
+                </div>
 
-    <hr>
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Mollitia perspiciatis at deserunt, asperiores harum quidem fuga quis nobis quo deleniti vitae expedita, sed est ratione. Enim, in sapiente. Rerum, ipsam!</p>
-</body>
+                {{ form.submit(class="btn btn-primary w-100 py-3") }}
+            </form>
+        </div>
 
+        <div class="col-md-6">
+            <h2 class="mb-4">Resultados</h2>
+            {% if resultados %}
+                <div class="result-card">
+                    <h4>1. Superelevação Teórica</h4>
+                    <p class="text-muted">Critério de Equilíbrio da Força Centrífuga</p>
+                    <div class="result-value">{{ resultados.h_teorica }} m</div>
+                </div>
+
+                <div class="result-card">
+                    <h4>2. Critério de Segurança</h4>
+                    <p class="text-muted">Estabilidade do veículo na curva</p>
+                    <div class="result-value">{{ resultados.h_seguranca }} m</div>
+                </div>
+
+                <div class="result-card">
+                    <h4>3. Segurança (Parado)</h4>
+                    <p class="text-muted">Veículo parado na via na curva</p>
+                    <div class="result-value">{{ resultados.h_seguranca_parado }} m</div>
+                </div>
+
+                <div class="result-card">
+                    <h4>4. Critério de Conforto</h4>
+                    <p class="text-muted">Transporte de Passageiros</p>
+                    <div class="result-value">{{ resultados.h_conforto }} m</div>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    Preencha os dados ao lado e clique em "Calcular" para ver os resultados aqui.
+                </div>
+                <img src="https://www.frateschi.com.br/site/wp-content/uploads/2016/05/dica006.jpg" class="img-fluid" alt="Superelevação Exemplo">
+            {% endif %}
+        </div>
+    </div>
+</div>
 
 {% endblock %}
