@@ -1,7 +1,7 @@
 from .init import app, db, login_manager
 from flask import Flask, request, render_template, url_for, redirect, flash
 from flask_login import login_user, logout_user, current_user, login_required
-from .forms import registro, CalculoFerroviario
+from .forms import registro, CalculoFerroviario, CalculoVelocidade
 from .models import User
 
 
@@ -46,6 +46,65 @@ def home():
         }
 
     return render_template("home.html", form=form, resultados=resultados)
+
+@app.route('/programa', methods=['GET', 'POST'])
+@login_required
+def programa():
+    form = CalculoVelocidade()
+    resultados = None
+    
+    if form.validate_on_submit():
+        R = form.raio.data
+        h = form.superelevacao.data
+        b = form.bitola.data
+        Lb = form.largura_boleto.data
+        V_input = form.velocidade.data 
+        H = form.altura_cg.data
+        eta = form.coef_seguranca.data
+        d = form.deslocamento_cg.data
+        Jc = form.aceleracao_jc.data
+        g = form.gravidade.data
+
+        B = b + Lb
+
+        termo_seguranca = (B / 2 - d) / (H * eta)
+        V_max_seguranca = (127 * (h / B + termo_seguranca))**0.5 * (R**0.5)
+
+        termo_conforto = (Jc * B) / g
+        V_max_conforto = (127 * ((h + termo_conforto) / B))**0.5 * (R**0.5)
+
+        val_interno_min = 127 * (h / B - termo_seguranca)
+        if val_interno_min < 0:
+            V_min = 0 
+        else:
+            V_min = val_interno_min**0.5 * (R**0.5)
+
+
+        R_min_seg = (V_input**2) / (127 * (h/B + termo_seguranca))
+        
+        R_min_conf = (V_input**2) / (127 * (Jc/g + h/B))
+        
+        R_min_final = max(R_min_seg, R_min_conf)
+
+        if R >= 500:
+            S = 0
+        else:
+            S = (6 / R) - 0.012
+            if S > 0.02:
+                S = 0.02
+            if S < 0:
+                S = 0
+        
+        resultados = {
+            "v_max_seg": round(V_max_seguranca, 2),
+            "v_max_conf": round(V_max_conforto, 2),
+            "v_min": round(V_min, 2),
+            "r_min": round(R_min_final, 2),
+            "superlargura_mm": round(S * 1000, 1) 
+        }
+
+    return render_template("programa.html", form=form, resultados=resultados)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
