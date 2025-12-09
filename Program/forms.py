@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField, SubmitField
-from wtforms.validators import Length, DataRequired, EqualTo, NumberRange
+from wtforms.validators import Length, DataRequired, InputRequired, EqualTo, NumberRange
 
 
 class registro(FlaskForm):
@@ -23,3 +23,19 @@ class CalculoFerroviario(FlaskForm):
     gravidade = FloatField('Gravidade (g) [m/s²]', validators=[DataRequired()], default=9.81)
     
     submit = SubmitField('Calcular Superelevação')
+
+class CalculoVelocidade(FlaskForm):
+    raio = FloatField('Raio da Curva (R) [m]', validators=[InputRequired()])
+    superelevacao = FloatField('Superelevação (h) [m]', validators=[InputRequired()])
+    bitola = FloatField('Bitola (b) [m]', validators=[InputRequired()])
+    largura_boleto = FloatField('Largura do Boleto (Lb) [m]', validators=[InputRequired()])
+    velocidade = FloatField('Velocidade Desejada (V) [km/h]', validators=[InputRequired()])
+    
+    altura_cg = FloatField('Altura do CG (H) [m]', validators=[InputRequired()])
+    coef_seguranca = FloatField('Coeficiente de Segurança (η)', validators=[InputRequired()], default=5.0)
+    deslocamento_cg = FloatField('Deslocamento do CG (d) [m]', validators=[InputRequired()], default=0.1)
+    
+    aceleracao_jc = FloatField('Aceleração lateral máx (Jc) [m/s²]', validators=[InputRequired()], default=0.65)
+    gravidade = FloatField('Gravidade (g) [m/s²]', validators=[InputRequired()], default=9.81)
+    
+    submit = SubmitField('Calcular Velocidades e Geometria')
