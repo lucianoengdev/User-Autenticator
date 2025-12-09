@@ -35,7 +35,23 @@
             </div>
         </div>
     </nav>
-</header>
+</header> 
+
+{% if current_user.is_authenticated %} 
+    <div class="bg-light border-bottom mb-4" style="margin-top: 60px;">
+        <div class="container">
+            <nav class="nav nav-pills py-2">
+                <a class="nav-link {{ 'active' if request.endpoint == 'home' else '' }}" href="{{ url_for('home') }}">
+                    📐 Superelevação
+                </a>
+                <a class="nav-link {{ 'active' if request.endpoint == 'programa' else '' }}" href="{{ url_for('programa') }}">
+                    🚂 Velocidades & Raios
+                </a>
+            </nav>
+        </div>
+    </div>
+{% endif %}
+
 <html lang="en" data-bs-theme="auto">
 
 {% block content %}
