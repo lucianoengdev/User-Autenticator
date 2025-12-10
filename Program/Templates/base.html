@@ -47,9 +47,13 @@
                 <a class="nav-link {{ 'active' if request.endpoint == 'programa' else '' }}" href="{{ url_for('programa') }}">
                     🚂 Velocidades & Raios
                 </a>
+                <a class="nav-link {{ 'active' if request.endpoint == 'trilho' else '' }}" href="{{ url_for('trilho') }}">
+                    🛤️ Dimensionamento Trilho
+                </a>
             </nav>
         </div>
     </div>
+
 {% endif %}
 
 <html lang="en" data-bs-theme="auto">
