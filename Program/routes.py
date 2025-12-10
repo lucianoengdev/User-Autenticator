@@ -1,7 +1,7 @@
 from .init import app, db, login_manager
 from flask import Flask, request, render_template, url_for, redirect, flash
 from flask_login import login_user, logout_user, current_user, login_required
-from .forms import registro, CalculoFerroviario, CalculoVelocidade
+from .forms import registro, CalculoFerroviario, CalculoVelocidade, CalculoTrilho
 from .models import User
 
 
@@ -105,6 +105,67 @@ def programa():
 
     return render_template("programa.html", form=form, resultados=resultados)
 
+@app.route('/trilho', methods=['GET', 'POST'])
+@login_required
+def trilho():
+    form = CalculoTrilho()
+    resultados = None
+    
+    if form.validate_on_submit():
+        Pe = form.carga_por_eixo.data
+        V = form.velocidade.data
+        a = form.espacamento_dormente.data
+        b = form.largura_dormente.data
+        C = form.coef_lastro.data
+        E = form.modulo_elasticidade.data
+        I = form.momento_inercia.data
+        W = form.modulo_resistencia.data
+        sigma_adm = form.tensao_admissivel.data
+
+        P = Pe / 2
+
+        Cd_calc = 1 + (V**2 / 30000)
+        
+        if Cd_calc < 1.4:
+            Cd = 1.4
+            msg_cd = "Adotado mínimo normativo (1.4)"
+        else:
+            Cd = Cd_calc
+            msg_cd = "Adotado valor calculado"
+
+        M_winkler = 0.1875 * P * Cd * a
+
+        D = 0.9 * C * b * a
+        gamma = (6 * E * I) / (D * (a**3))
+
+        term_h1 = (7 + 8 * gamma) / (8 * (5 + 2 * gamma))
+        M_zim_1 = term_h1 * P * Cd * a
+
+        term_h2 = gamma / (2 + 3 * gamma)
+        M_zim_2 = term_h2 * P * Cd * a
+
+        M_zim_max = max(M_zim_1, M_zim_2)
+        M_projeto = max(M_winkler, M_zim_max)
+
+        sigma_trabalho = M_projeto / W
+        
+        status = "APROVADO" if sigma_trabalho < sigma_adm else "REPROVADO"
+        css_class = "text-success" if sigma_trabalho < sigma_adm else "text-danger"
+
+        resultados = {
+            "P": P,
+            "Cd": round(Cd, 3),
+            "Cd_calc": round(Cd_calc, 3),  
+            "msg_cd": msg_cd,             
+            "gamma": round(gamma, 3),
+            "M_winkler": round(M_winkler, 2),
+            "M_zim": round(M_zim_max, 2),
+            "sigma_calc": round(sigma_trabalho, 2),
+            "status": status,
+            "css_class": css_class
+        }
+
+    return render_template("trilho.html", form=form, resultados=resultados)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
