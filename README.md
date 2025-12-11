@@ -31,6 +31,12 @@ Verifies if a specific rail profile is suitable for the operational load using s
 2.  Bending Moment ($M_{max}$): Compares results from Winkler's Method (Fixed Supports) and Zimmermann's Method (Elastic Foundation).
 3.  Stress Verification: Checks if the working stress ($\sigma$) exceeds the steel's admissible limits ($\sigma_{adm}$).
 
+### 🪵 Module 4: Sleeper Dimensioning (New in v1.3.0)
+Validates the structural integrity of wooden sleepers (dormentes) under dynamic loads:
+1.  Load Distribution: Calculates the effective load acting on a single sleeper ($P$) considering vehicle axle spacing ($d$) and sleeper spacing ($a$).
+2.  Dynamic Analysis: Applies the Dynamic Coefficient ($C_d$) to the static wheel load.
+3.  Stress Verification: Determines the maximum bending moment ($M_{max}$) and checks if the resulting flexural stress ($\sigma$) is within the timber's admissible limits ($\sigma_{adm}$).
+
 ## 🛠️ Technologies Used
 * Language: Python
 * Web Framework: Flask
@@ -43,10 +49,12 @@ Verifies if a specific rail profile is suitable for the operational load using s
 The ambition of this project is to become a handy, quick-reference tool for railway engineers to validate track parameters instantly. It aims to bridge the gap between theoretical formulas and practical, on-the-fly verification in the field or office.
 
 ## 📍 Current Stage
-Status: Active (v1.2.0)
+Status: Active (v1.3.0)
 * v1.0: Superelevation Calculator & Auth System.
 * v1.1: Added Speed & Geometry Calculator module.
 * v1.2: Added Rail Dimensioning (Structural Analysis) module.
+* v1.3: Added Sleeper Dimensioning (Dormente) module.
+
 
 The application is fully functional. Users can register, log in, and perform complex geometric and structural calculations using real-world variables.
 
