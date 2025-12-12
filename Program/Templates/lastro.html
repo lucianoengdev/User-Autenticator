@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block tittle %}Dimensionamento de Lastro{% endblock %}
+
+{% block style %}
+<style>
+    .result-card {
+        background-color: #f8f9fa; /* Cinza claro */
+        border-left: 5px solid #6c757d; /* Cinza pedra */
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 5px;
+    }
+    .result-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #495057;
+    }
+    .btn-stone {
+        background-color: #6c757d;
+        color: white;
+        font-weight: bold;
+    }
+    .btn-stone:hover {
+        background-color: #5a6268;
+        color: white;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5">
+    <div class="row">
+        <div class="col-md-4">
+            <h2 class="mb-4 text-secondary">Cálculo de Lastro</h2>
+            <p class="small text-muted">Dimensionamento da altura (h) pela fórmula de Talbot.</p>
+            
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                
+                <h6 class="text-uppercase text-secondary small fw-bold">Veículo e Cargas</h6>
+                <div class="form-floating mb-2">
+                    {{ form.carga_por_eixo(class="form-control", placeholder=" ") }}
+                    {{ form.carga_por_eixo.label }}
+                </div>
+                <div class="form-floating mb-2">
+                    {{ form.velocidade(class="form-control", placeholder=" ") }}
+                    {{ form.velocidade.label }}
+                </div>
+                <div class="form-floating mb-3">
+                    {{ form.distancia_eixos_veiculo(class="form-control", placeholder=" ") }}
+                    {{ form.distancia_eixos_veiculo.label }}
+                </div>
+
+                <h6 class="text-uppercase text-secondary small fw-bold mt-3">Via e Lastro</h6>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="form-floating mb-2">
+                            {{ form.taxa_dormentacao(class="form-control", placeholder=" ") }}
+                            <label style="font-size: 0.8em">Taxa (d/km)</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating mb-2">
+                            {{ form.largura_dormente(class="form-control", placeholder=" ") }}
+                            <label style="font-size: 0.8em">Largura Dorm.(b)</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-floating mb-2">
+                    {{ form.faixa_socaria(class="form-control", placeholder=" ") }}
+                    {{ form.faixa_socaria.label }}
+                </div>
+                <div class="form-floating mb-3">
+                    {{ form.tensao_admissivel(class="form-control", placeholder=" ") }}
+                    {{ form.tensao_admissivel.label }}
+                    <div class="form-text">Capacidade do sublastro/leito.</div>
+                </div>
+
+                {{ form.submit(class="btn btn-stone w-100 py-3 mt-2") }}
+            </form>
+        </div>
+
+        <div class="col-md-8">
+            <h2 class="mb-4">Análise de Distribuição</h2>
+            {% if resultados %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="result-card shadow-sm">
+                            <h6>Altura Mínima de Lastro (h)</h6>
+                            <div class="result-value">{{ resultados.h_calc }} cm</div>
+                            <small class="text-muted">Para σ < {{ resultados.sigma_adm }} kgf/cm²</small>
+                            <hr>
+                            <p class="mb-1 small"><strong>Pressão Contato (σ₀):</strong> {{ resultados.sigma_0 }} kgf/cm²</p>
+                            <p class="mb-0 small"><strong>Carga no Lastro (P):</strong> {{ resultados.P_dormente }} kgf</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 mt-4">
+                        <div class="card p-3 shadow-sm">
+                            <h5 class="card-title text-center text-secondary">Distribuição de Tensão x Profundidade</h5>
+                            <canvas id="talbotChart" style="max-height: 400px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    const ctx = document.getElementById('talbotChart').getContext('2d');
+                    const talbotChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: {{ grafico.labels | safe }}, // Profundidades (Eixo X)
+                            datasets: [{
+                                label: 'Tensão Atuante (Talbot)',
+                                data: {{ grafico.data_sigma | safe }},
+                                borderColor: 'rgba(108, 117, 125, 1)', // Cor Cinza
+                                backgroundColor: 'rgba(108, 117, 125, 0.2)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Tensão Admissível',
+                                data: {{ grafico.data_limit | safe }},
+                                borderColor: 'rgba(220, 53, 69, 1)', // Cor Vermelha
+                                borderDash: [5, 5],
+                                pointRadius: 0,
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                x: { 
+                                    title: { display: true, text: 'Profundidade do Lastro (cm)' }
+                                },
+                                y: { 
+                                    title: { display: true, text: 'Pressão (kgf/cm²)' },
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.dataset.label + ': ' + context.raw + ' kgf/cm²';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                </script>
+
+            {% else %}
+                <div class="alert alert-light border text-center p-5">
+                    <h4>Aguardando Dados...</h4>
+                    <p>Preencha os dados para calcular a altura da camada de lastro e gerar o diagrama de pressões.</p>
+                    <div class="text-muted display-1"><i class="bi bi-layers-half"></i></div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
