@@ -1,7 +1,7 @@
 from .init import app, db, login_manager
 from flask import Flask, request, render_template, url_for, redirect, flash
 from flask_login import login_user, logout_user, current_user, login_required
-from .forms import registro, CalculoFerroviario, CalculoVelocidade, CalculoTrilho, CalculoDormente
+from .forms import registro, CalculoFerroviario, CalculoVelocidade, CalculoTrilho, CalculoDormente, CalculoLastro
 from .models import User
 
 
@@ -224,6 +224,71 @@ def dormente():
         }
 
     return render_template("dormente.html", form=form, resultados=resultados)
+
+@app.route('/lastro', methods=['GET', 'POST'])
+@login_required
+def lastro():
+    form = CalculoLastro()
+    resultados = None
+    grafico_data = None
+    
+    if form.validate_on_submit():
+        Pe = form.carga_por_eixo.data
+        V = form.velocidade.data
+        d = form.distancia_eixos_veiculo.data
+        taxa = form.taxa_dormentacao.data
+        b = form.largura_dormente.data
+        fs = form.faixa_socaria.data
+        sigma_adm = form.tensao_admissivel.data
+
+        a = 100000 / taxa
+
+        Pr = Pe / 2
+        Cd_calc = 1 + (V**2 / 30000)
+        Cd = max(Cd_calc, 1.4)
+        
+        fator_distribuicao = d / a
+        P_dormente = (Pr / fator_distribuicao) * Cd
+
+        area_contato = b * fs
+        sigma_0 = P_dormente / area_contato
+
+
+        if sigma_adm <= 0:
+            sigma_adm = 1.0 
+
+        h_calc = (16.8 * sigma_0 / sigma_adm) ** 0.8
+
+        h_final = round(h_calc, 1)
+
+        labels_z = []
+        values_sigma = []
+        limit_line = []
+
+        profundidade_max = int(h_final) + 30
+        for z in range(5, profundidade_max, 5):
+            s_z = (16.8 * sigma_0) / (z ** 1.25)
+            
+            labels_z.append(z)
+            values_sigma.append(round(s_z, 2))
+            limit_line.append(sigma_adm)
+
+        resultados = {
+            "a": round(a, 1),
+            "P_dormente": round(P_dormente, 0),
+            "area_contato": round(area_contato, 0),
+            "sigma_0": round(sigma_0, 2),
+            "h_calc": h_final,
+            "sigma_adm": sigma_adm
+        }
+
+        grafico_data = {
+            "labels": labels_z,
+            "data_sigma": values_sigma,
+            "data_limit": limit_line
+        }
+
+    return render_template("lastro.html", form=form, resultados=resultados, grafico=grafico_data)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
