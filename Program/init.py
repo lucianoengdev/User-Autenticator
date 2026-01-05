@@ -10,7 +10,22 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or '6236128622fa7e7b571e02cf4f96256e'
 
 # 2. BANCO DE DADOS INTELIGENTE (Supabase vs Local)
+# ... imports ...
+
 database_url = os.environ.get('DATABASE_URL')
+
+# --- INÍCIO DO CÓDIGO DE DEBUG ---
+print("--- DEBUG DO BANCO DE DADOS ---")
+if database_url:
+    # Mostra só os 10 primeiros caracteres para não vazar a senha no log
+    print(f"URL ENCONTRADA: {database_url[:15]}...")
+else:
+    print("URL NÃO ENCONTRADA! O SITE VAI TENTAR USAR SQLITE E VAI FALHAR.")
+print("-----------------------------")
+# --- FIM DO CÓDIGO DE DEBUG ---
+
+
+# ... resto do código ...
 
 # Corrige o problema do 'postgres://' que alguns sistemas usam
 if database_url and database_url.startswith("postgres://"):
