@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 
 # 1. SECRET KEY DINÂMICA
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or '6236128622fa7e7b571e02cf4f96256e'
 
 # 2. BANCO DE DADOS INTELIGENTE (Supabase vs Local)
 database_url = os.environ.get('DATABASE_URL')
