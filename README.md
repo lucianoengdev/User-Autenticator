@@ -1,4 +1,4 @@
-# Railway Engineering Suite & User-Authenticator
+# Railway Calculator
 
 ## 📖 About the Project
 This project is a robust web application designed for Transport Engineers and students. It combines a secure user authentication system with a specialized engineering suite for Railway Geometric and Structural Design.
