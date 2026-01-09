@@ -10,6 +10,7 @@ The main goal is to automate the complex calculations required for railway engin
 ### 🔐 Core System
 * User Authentication: Secure Login, Registration, and Logout system using password hashing.
 * Responsive Interface: Clean UI built with Bootstrap 5, featuring tabbed navigation for easy access to tools.
+* Calculation Memory: Detailed step-by-step breakdown of all formulas and intermediate results ("Show Calculation Memory"), allowing users to audit and verify the engineering logic.
 
 ### 📐 Module 1: Superelevation Calculator
 Determines the required superelevation ($h$) based on four critical engineering criteria:
@@ -55,13 +56,13 @@ Determines the required ballast layer thickness to protect the subgrade:
 The ambition of this project is to become a handy, quick-reference tool for railway engineers to validate track parameters instantly. It aims to bridge the gap between theoretical formulas and practical, on-the-fly verification in the field or office.
 
 ## 📍 Current Stage
-Status: Active (v1.4.0)
+Status: Active (v1.4.1)
 * v1.0: Superelevation Calculator & Auth System.
 * v1.1: Added Speed & Geometry Calculator module.
 * v1.2: Added Rail Dimensioning (Structural Analysis) module.
 * v1.3: Added railroad tie Dimensioning module.
 * v1.4: Added Ballast Dimensioning module with interactive charts.
-
+* v1.4.1: Implemented "Calculation Memory" feature to display step-by-step formulas for all modules.
 
 The application is fully functional. Users can register, log in, and perform complex geometric and structural calculations using real-world variables.
 
