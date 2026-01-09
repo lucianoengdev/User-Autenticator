@@ -162,6 +162,26 @@
                 </div>
             {% endif %}
         </div>
+        {% if memoria %}
+        <div class="accordion mt-4 shadow-sm" id="accordionMemoria">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button collapsed fw-bold text-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                        <i class="bi bi-calculator me-2"></i> Ver Memória de Cálculo Detalhada
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionMemoria">
+                    <div class="accordion-body bg-light">
+                        <ul class="list-group list-group-flush font-monospace small">
+                            {% for passo in memoria %}
+                            <li class="list-group-item bg-light border-0 py-1">{{ passo }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
